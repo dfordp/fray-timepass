@@ -1,13 +1,11 @@
 figma.showUI(__html__, { width: 300, height: 450 });
 
-type RGB = { r: number; g: number; b: number };
-
-function rgbToHex(r: number, g: number, b: number): string {
-  const toHex = (v: number) => Math.round(v * 255).toString(16).padStart(2, '0');
+function rgbToHex(r, g, b) {
+  const toHex = (v) => Math.round(v * 255).toString(16).padStart(2, '0');
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
-function hexToRgb(hex: string): RGB {
+function hexToRgb(hex) {
   const parsed = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   if (!parsed) throw new Error('Invalid HEX');
   return {
@@ -17,8 +15,8 @@ function hexToRgb(hex: string): RGB {
   };
 }
 
-function extractColorsFromSelection(): string[] {
-  const colorSet = new Set<string>();
+function extractColorsFromSelection() {
+  const colorSet = new Set();
   for (const node of figma.currentPage.selection) {
     if ('fills' in node && Array.isArray(node.fills)) {
       for (const fill of node.fills) {
@@ -33,19 +31,15 @@ function extractColorsFromSelection(): string[] {
   return Array.from(colorSet);
 }
 
+figma.ui.onmessage = (msg) => {
+  const savedPage = figma.root.findOne((node) => node.name === 'better-color');
 
-figma.ui.onmessage = (msg: {
-  type: string;
-  colorSave?: { color: RGB | string; title: string };
-}) => {
-  const savedPage = figma.root.findOne((node) => node.name === 'better-color') as PageNode;
-
-    if (msg.type === 'PING') {
+  if (msg.type === 'PING') {
     console.log('UI is ready');
   }
 
   if (msg.type === 'colorSave' && msg.colorSave) {
-    const colorRGB: RGB = typeof msg.colorSave.color === 'string'
+    const colorRGB = typeof msg.colorSave.color === 'string'
       ? hexToRgb(msg.colorSave.color)
       : msg.colorSave.color;
 
@@ -64,7 +58,7 @@ figma.ui.onmessage = (msg: {
   }
 
   else if (msg.type === 'pick' && msg.colorSave) {
-    const colorRGB: RGB = typeof msg.colorSave.color === 'string'
+    const colorRGB = typeof msg.colorSave.color === 'string'
       ? hexToRgb(msg.colorSave.color)
       : msg.colorSave.color;
 
@@ -80,8 +74,8 @@ figma.ui.onmessage = (msg: {
       const data = savedPage.children
         .filter((item) => item.type === 'RECTANGLE')
         .map((item) => {
-          const rect = item as RectangleNode;
-          const fill = rect.fills?.[0];
+          const rect = item;
+          const fill = rect.fills[0];
           if (fill && fill.type === 'SOLID') {
             return {
               title: rect.name,

@@ -2,7 +2,7 @@
   "name": "Colour Audit",
   "id": "940501649271086343",
   "api": "1.0.0",
-  "main": "dist/code.js",
-  "ui": "dist/ui.html",
+  "main": "plugin/controller.js",
+  "ui": "./index.html",
   "editorType" : ["figma"]
 }
